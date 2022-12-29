@@ -17,31 +17,31 @@ template MiMCSponge(nInputs, nRounds, nOutputs) {
     S[i] = MiMCFeistel(nRounds);
     S[i].k <== k;
     if (i == 0) {
-      S[i].xL_in <== ins[0];
-      S[i].xR_in <== 0;
+      S[i].xLin <== ins[0];
+      S[i].xRin <== 0;
     } else {
-      S[i].xL_in <== S[i-1].xL_out + ins[i];
-      S[i].xR_in <== S[i-1].xR_out;
+      S[i].xLin <== S[i-1].xLout + ins[i];
+      S[i].xRin <== S[i-1].xRout;
     }
   }
 
-  outs[0] <== S[nInputs - 1].xL_out;
+  outs[0] <== S[nInputs - 1].xLout;
 
   for (i = 0; i < nOutputs - 1; i++) {
     S[nInputs + i] = MiMCFeistel(nRounds);
     S[nInputs + i].k <== k;
-    S[nInputs + i].xL_in <== S[nInputs + i - 1].xL_out;
-    S[nInputs + i].xR_in <== S[nInputs + i - 1].xR_out;
-    outs[i + 1] <== S[nInputs + i].xL_out;
+    S[nInputs + i].xLin <== S[nInputs + i - 1].xLout;
+    S[nInputs + i].xRin <== S[nInputs + i - 1].xRout;
+    outs[i + 1] <== S[nInputs + i].xLout;
   }
 }
 
 template MiMCFeistel(nrounds) {
-    signal input xL_in;
-    signal input xR_in;
+    signal input xLin;
+    signal input xRin;
     signal input k;
-    signal output xL_out;
-    signal output xR_out;
+    signal output xLout;
+    signal output xRout;
 
     // doesn't contain the first and last round constants, which are always zero
     var c_partial[218] = [
@@ -278,16 +278,16 @@ template MiMCFeistel(nrounds) {
         } else {
           c = c_partial[i - 1];
         }
-        t = (i==0) ? k+xL_in : k + xL[i-1] + c;
+        t = (i==0) ? k+xLin : k + xL[i-1] + c;
         t2[i] <== t*t;
         t4[i] <== t2[i]*t2[i];
         if (i<nrounds-1) {
-          var aux = (i==0) ? xR_in : xR[i-1] ;
+          var aux = (i==0) ? xRin : xR[i-1] ;
           xL[i] <== aux + t4[i]*t;
-          xR[i] <== (i==0) ? xL_in : xL[i-1];
+          xR[i] <== (i==0) ? xLin : xL[i-1];
         } else {
-          xR_out <== xR[i-1] + t4[i]*t;
-          xL_out <== xL[i-1];
+          xRout <== xR[i-1] + t4[i]*t;
+          xLout <== xL[i-1];
         }
     }
 }
