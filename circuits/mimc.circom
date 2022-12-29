@@ -19,7 +19,7 @@
 pragma circom 2.0.0;
 
 template MiMC7(nrounds) {
-    signal input x_in;
+    signal input xin;
     signal input k;
     signal output out;
 
@@ -124,7 +124,7 @@ template MiMC7(nrounds) {
     signal t7[nrounds-1];
 
     for (var i=0; i<nrounds; i++) {
-        t = (i==0) ? k+x_in : k + t7[i-1] + c[i];
+        t = (i==0) ? k+xin : k + t7[i-1] + c[i];
         t2[i] <== t*t;
         t4[i] <== t2[i]*t2[i];
         t6[i] <== t4[i]*t2[i];
@@ -147,7 +147,7 @@ template MultiMiMC7(nInputs, nRounds) {
     r[0] <== k;
     for (var i=0; i<nInputs; i++) {
         mims[i] = MiMC7(nRounds);
-        mims[i].x_in <== in[i];
+        mims[i].xin <== in[i];
         mims[i].k <== r[i];
         r[i+1] <== r[i] + in[i] + mims[i].out;
     }
